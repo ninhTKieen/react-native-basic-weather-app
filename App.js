@@ -1,112 +1,84 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
-import React from 'react';
-import type {Node} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
   View,
+  Text,
+  ScrollView,
+  ImageBackground,
+  StyleSheet,
+  StatusBar,
+  Dimensions,
 } from 'react-native';
+import LoadedView from './components/LoadedView'
+import SearchBar from './components/SearchBar';
+import Weather from './components/Weather';
+const API_KEY = "3f0269e0346e8b298eb4818ce4ecf446";
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const WeatherApp = () => {
+  const [weatherData, setWeatherData] = useState(null);
+  const [loaded, setLoaded] = useState(true);
 
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+  const fetchWeatherData = async(cityName) => {
+    setLoaded(false);
+    let API;
+    if(cityName === 'Rome'){
+      API = `https://api.openweathermap.org/data/2.5/weather?id=${3169070}&appid=${API_KEY}`
+    }
+    else {
+      API = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}`;
+    }
+    try {
+      const response = await fetch(API);
+      if(response.status == 200) {
+        const data = await response.json();
+        setWeatherData(data);
+      }
+      else {
+        setWeatherData(null);
+      }
+      setLoaded(true);
+    }
+    catch(error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(()=> {
+    fetchWeatherData('roma capitale');
+  },[])
+
+  if(!loaded) {
+    return (
+      <LoadedView />
+    )
+  }
+  else if(weatherData === null) {
+    return <View style = {styles.container} >
+      <ImageBackground
+        source = {require('./assets/background/oops.jpg')}
+        style = {styles.primaryView}
+      >
+        <Text>Say you remember me</Text>
+        <SearchBar fetchWeatherData = {fetchWeatherData} />
+      </ImageBackground>
     </View>
-  );
-};
-
-const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
+  }
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
-
+    <View style = {styles.container}>
+      <Weather weatherData = {weatherData} fetchWeatherData ={fetchWeatherData} />
+    </View>
+  )
+  }
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container : {
+    flex : 1,
+    justifyContent : 'center',
+    alignItems : 'center'
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
-export default App;
+  primaryView : {
+    width : Dimensions.get('window').width,
+    height : Dimensions.get('window').height,
+    alignItems : 'center',
+    padding : StatusBar.currentHeight
+  }
+})
+export default WeatherApp;
