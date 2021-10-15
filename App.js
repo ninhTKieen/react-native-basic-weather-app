@@ -20,7 +20,7 @@ const WeatherApp = () => {
   const fetchWeatherData = async(cityName) => {
     setLoaded(false);
     let API;
-    if(cityName === 'Rome'){
+    if(cityName === 'Rome'.toLowerCase()){
       API = `https://api.openweathermap.org/data/2.5/weather?id=${3169070}&appid=${API_KEY}`
     }
     else {
@@ -43,7 +43,7 @@ const WeatherApp = () => {
   }
 
   useEffect(()=> {
-    fetchWeatherData('roma capitale');
+    fetchWeatherData('ha noi');
   },[])
 
   if(!loaded) {
