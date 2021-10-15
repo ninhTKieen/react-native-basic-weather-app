@@ -12,10 +12,9 @@ import BackGround from './BackGround';
 import SearchBar from './SearchBar';
 const formatttedTime = (unixTime) => {
     var date = new Date(unixTime);
-    // var hours = date.getHours();
-    // var minutes = date.getMinutes();
-    // return `${hours}:${minutes}`;
-    return date.toLocaleTimeString();
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    return `${hours}:${minutes}`;
 }
 const dateBuilder = (dt, timezone) => {
     let d = new Date();
@@ -25,7 +24,14 @@ const dateBuilder = (dt, timezone) => {
     let date = new Date(curr_time);
     let hours = date.getHours();
     let minutes = date.getMinutes();
-    return `${hours}:${minutes}`
+    let unit = (hours > 12) ? 'pm' : 'am';
+    if(hours > 12) {
+        hours -=12;
+    }
+    if(minutes < 10) {
+        minutes = '0' +minutes;
+    }
+    return `${hours}:${minutes} ${unit}`
 }
 const Weather = ({weatherData, fetchWeatherData}) => {
     const [imgBackGround, setImgBackGround] = useState(null);
@@ -65,12 +71,14 @@ const Weather = ({weatherData, fetchWeatherData}) => {
                 style = {styles.imgBrg}
                 resizeMode = 'cover'
             >
+            <SearchBar fetchWeatherData = {fetchWeatherData} />
+
                 <View style = {styles.weatherStatis}>
-                    <View >
+                    <View style = {{flex : 0.7}} >
                         <Text style = {styles.staticText}>{name}/{country}</Text>
                         <Text style = {styles.staticText}>{Math.round(temp - 273.15)}°C</Text>
-                        <Text style = {styles.staticText}>{formatttedTime(sunrise)} am</Text>
-                        <Text style = {styles.staticText}>{formatttedTime(sunset)} pm</Text>
+                        <Text style = {styles.staticText}>Sunrise : {formatttedTime(sunrise)} am</Text>
+                        <Text style = {styles.staticText}>Sunset : {formatttedTime(sunset)} pm</Text>
                         <Text style = {styles.staticText}>{dateBuilder(dt, timezone)}</Text>
                     </View>
                     <View style = {styles.itemRight}>
@@ -81,38 +89,40 @@ const Weather = ({weatherData, fetchWeatherData}) => {
                                 uri : `http://openweathermap.org/img/wn/${icon}@2x.png`
                             }}
                         />
-                        <Text style = {styles.staticText}>{main}/{description}</Text>
+                        <Text style = {styles.staticText}>{main}</Text>
+                        <Text style = {styles.staticText}>{description}</Text>
                     </View>
                 </View>
-                <SearchBar fetchWeatherData = {fetchWeatherData} />
             </ImageBackground>
         </View>
     )
 }
 const styles = StyleSheet.create({
     container : {
-        alignItems : 'center',
-        justifyContent : 'center'
+        justifyContent : 'center',
+        // paddingTop : StatusBar.currentHeight,
     },
     imgBrg : {
         width : Dimensions.get('window').width,
         height : Dimensions.get('window').height,
-        // alignItems : 'center',
-        paddingTop : StatusBar.currentHeight
+        paddingTop : 20,
+        alignItems : 'center',
     },
     weatherStatis : {
         backgroundColor : '#18181b99',
         flexDirection : 'row',
         justifyContent : 'space-between',
-        marginBottom : 20,
+        marginTop : 20,
         width : '100%',
-        // position : 'absolute',
+        borderRadius : 20,
+        padding : 10
     },
     staticText : {
         fontSize : 25
     },
     itemRight : {
         flex : 0.4,
+        alignItems : 'center'
     }
 })
 export default Weather;

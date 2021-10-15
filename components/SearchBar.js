@@ -29,8 +29,9 @@ const styles = StyleSheet.create({
         justifyContent : 'space-between',
         flexDirection : 'row',
         alignItems : 'center',
+        borderRadius : 20,
         margin : 10,
-        borderRadius : 20,       
+        width : '90%'       
     }
 })
 
