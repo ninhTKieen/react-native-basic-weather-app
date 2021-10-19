@@ -14,6 +14,9 @@ const formatttedTime = (unixTime) => {
     var date = new Date(unixTime);
     var hours = date.getHours();
     var minutes = date.getMinutes();
+    if(minutes < 10) {
+        minutes = '0' + minutes;
+    }
     return `${hours}:${minutes}`;
 }
 const dateBuilder = (dt, timezone) => {
