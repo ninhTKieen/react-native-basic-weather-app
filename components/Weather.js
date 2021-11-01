@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import BackGround from './BackGround';
 import SearchBar from './SearchBar';
+import WeatherItem from './WeatherItem';
 const formatttedTime = (unixTime) => {
     var date = new Date(unixTime);
     var hours = date.getHours();
@@ -19,7 +20,7 @@ const formatttedTime = (unixTime) => {
     }
     return `${hours}:${minutes}`;
 }
-const dateBuilder = (dt, timezone) => {
+const dateBuilder = (timezone) => {
     let d = new Date();
     let localTime = d.getTime();
     let localOffset = d.getTimezoneOffset()*60000;
@@ -27,6 +28,9 @@ const dateBuilder = (dt, timezone) => {
     let date = new Date(curr_time);
     let hours = date.getHours();
     let minutes = date.getMinutes();
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
     let unit = (hours > 12) ? 'pm' : 'am';
     if(hours > 12) {
         hours -=12;
@@ -34,10 +38,20 @@ const dateBuilder = (dt, timezone) => {
     if(minutes < 10) {
         minutes = '0' +minutes;
     }
-    return `${hours}:${minutes} ${unit}`
+    return `${hours}:${minutes} ${unit}\n${day}/${month}/${year}`;
+}
+const checkTimeInDay = (timezone) => {
+    let d = new Date();
+    let localTime = d.getTime();
+    let localOffset = d.getTimezoneOffset()*60000;
+    let curr_time = localTime + localOffset + (1000*timezone);
+    let date = new Date(curr_time);
+    let hours = date.getHours();
+    return hours;
 }
 const Weather = ({weatherData, fetchWeatherData}) => {
     const [imgBackGround, setImgBackGround] = useState(null);
+    const [timer, setTimer] = useState("");
     const {
         weather : [
             {
@@ -48,12 +62,9 @@ const Weather = ({weatherData, fetchWeatherData}) => {
         name,
         main : {
             temp,
-            humidity
+            humidity,
+            pressure
         },
-        wind : {
-            speed
-        },
-        dt,
         sys : {
             country,
             sunrise,
@@ -62,11 +73,18 @@ const Weather = ({weatherData, fetchWeatherData}) => {
         timezone
     } = weatherData;
     const getImgBackGround = (weather) => {
-        return BackGround(weather);
+        const timeOfDay = checkTimeInDay(timezone);
+        return BackGround(weather, timeOfDay);
     }
     useEffect(()=>{
         setImgBackGround(getImgBackGround(main));
-    },[weatherData])
+        setTimer(dateBuilder(timezone));
+    },[weatherData]);
+    useEffect(() => {
+        setInterval(() => {
+            setTimer(dateBuilder(timezone))
+        }, 10000)
+    }, [])
     return (
         <View style = {styles.container}>
             <ImageBackground
@@ -74,26 +92,36 @@ const Weather = ({weatherData, fetchWeatherData}) => {
                 style = {styles.imgBrg}
                 resizeMode = 'cover'
             >
-            <SearchBar fetchWeatherData = {fetchWeatherData} />
-
                 <View style = {styles.weatherStatis}>
-                    <View style = {{flex : 0.7}} >
-                        <Text style = {styles.staticText}>{name}/{country}</Text>
-                        <Text style = {styles.staticText}>{Math.round(temp - 273.15)}°C</Text>
-                        <Text style = {styles.staticText}>Sunrise : {formatttedTime(sunrise)} am</Text>
-                        <Text style = {styles.staticText}>Sunset : {formatttedTime(sunset)} pm</Text>
-                        <Text style = {styles.staticText}>{dateBuilder(dt, timezone)}</Text>
+                    <View style = {{flex : 0.6}} >
+                        <Text style = {styles.staticText}>{name}</Text>
+                        <Text style = {styles.staticText}>{country}</Text>
+                        <Text style = {styles.staticText}>{timer}</Text>
                     </View>
                     <View style = {styles.itemRight}>
-                        <Image 
-                            source = {{
-                                width : 100,
-                                height : 100,
-                                uri : `http://openweathermap.org/img/wn/${icon}@2x.png`
-                            }}
-                        />
+                        <WeatherItem title = "Sunrise" value = {formatttedTime(sunrise)} unit = "am" />
+                        <WeatherItem title = "Sunset" value = {formatttedTime(sunset)} unit = "pm" />
+                        <WeatherItem title = "Humidity" value = {humidity} unit = "%" />
+                        <WeatherItem title = "Pressure" value = {pressure} unit = "hPa" />                        
+                    </View>
+                </View>
+                <View style = {styles.weatherBottom}>
+                    <View style = {styles.weatherBottomLeft}>
+                        <View style = {styles.iconAndTemp}>
+                            <Image
+                                source = {{
+                                    width : 80,
+                                    height : 70,
+                                    uri : `http://openweathermap.org/img/wn/${icon}@2x.png`,
+                                }}            
+                            />
+                            <Text style = {{fontSize : 40, fontWeight : 'bold'}}>{Math.round(temp - 273.15)}°C</Text>
+                        </View>
                         <Text style = {styles.staticText}>{main}</Text>
-                        <Text style = {styles.staticText}>{description}</Text>
+                        <Text style = {{fontSize : 22, fontWeight : 'bold'}}>{description}</Text>
+                    </View>
+                    <View style = {styles.weatherBottomRight}>
+                        <SearchBar fetchWeatherData = {fetchWeatherData} />
                     </View>
                 </View>
             </ImageBackground>
@@ -103,7 +131,6 @@ const Weather = ({weatherData, fetchWeatherData}) => {
 const styles = StyleSheet.create({
     container : {
         justifyContent : 'center',
-        // paddingTop : StatusBar.currentHeight,
     },
     imgBrg : {
         width : Dimensions.get('window').width,
@@ -120,11 +147,36 @@ const styles = StyleSheet.create({
         borderRadius : 20,
         padding : 10
     },
+    weatherBottom : {
+        flexDirection : 'row',
+        justifyContent : 'space-between',
+        width : '100%',
+            
+    },
+    weatherBottomLeft : {
+        justifyContent : 'center',
+        alignItems : 'center',
+        backgroundColor : '#18181b85',
+        width : '100%',
+        height : 180,
+        margin : 10,
+        flex : 0.5,
+        borderRadius : 50
+    },
+    weatherBottomRight : {
+        flex : 0.5,
+        justifyContent : 'center',
+        alignItems : 'center'
+    },
     staticText : {
-        fontSize : 25
+        fontSize : 22,
+        fontWeight : 'bold'
     },
     itemRight : {
-        flex : 0.4,
+        flex : 0.7,
+    },
+    iconAndTemp : {
+        flexDirection : 'row',
         alignItems : 'center'
     }
 })

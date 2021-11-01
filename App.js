@@ -16,7 +16,6 @@ const API_KEY = "3f0269e0346e8b298eb4818ce4ecf446";
 const WeatherApp = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [loaded, setLoaded] = useState(true);
-
   const fetchWeatherData = async(cityName) => {
     setLoaded(false);
     let API;

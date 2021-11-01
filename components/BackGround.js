@@ -4,8 +4,9 @@ const sunny = require('../assets/background/sunny.jpg');
 const snow = require('../assets/background/snow.jpg');
 const clouds = require('../assets/background/clouds.jpg');
 const drizzle = require('../assets/background/drizzle.jpg');
-const thunderstorm = require('../assets/background/thunderstorm.jpg')
-const BackGround = (weather) => {
+const thunderstorm = require('../assets/background/thunderstorm.jpg');
+const nightClouds = require('../assets/background/nightClouds.jpg');
+const BackGround = (weather, time) => {
     if(weather == 'Clear') {
         return sunny;
     }        
@@ -17,6 +18,9 @@ const BackGround = (weather) => {
     }
     if(weather == 'Rain') {
         return rainy;
+    }
+    if(weather == "Clouds" && time >= 17) {
+        return nightClouds;
     }
     if(weather == "Clouds") {
         return clouds;
