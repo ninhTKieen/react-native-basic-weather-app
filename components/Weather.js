@@ -110,9 +110,12 @@ const Weather = ({weatherData, fetchWeatherData}) => {
                         <View style = {styles.iconAndTemp}>
                             <Image
                                 source = {{
+                                    uri : `https://openweathermap.org/img/wn/${icon}@2x.png`,
+                                }}
+                                style = {{
                                     width : 80,
                                     height : 70,
-                                    uri : `http://openweathermap.org/img/wn/${icon}@2x.png`,
+                                    resizeMode : 'contain'
                                 }}            
                             />
                             <Text style = {{fontSize : 40, fontWeight : 'bold'}}>{Math.round(temp - 273.15)}°C</Text>
