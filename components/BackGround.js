@@ -19,7 +19,7 @@ const BackGround = (weather, time) => {
     if(weather == 'Rain') {
         return rainy;
     }
-    if(weather == "Clouds" && time >= 17) {
+    if(weather == "Clouds" && (time >= 17 || time <= 5)) {
         return nightClouds;
     }
     if(weather == "Clouds") {
