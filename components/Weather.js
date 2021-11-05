@@ -83,7 +83,7 @@ const Weather = ({weatherData, fetchWeatherData}) => {
     useEffect(() => {
         setInterval(() => {
             setTimer(dateBuilder(timezone))
-        }, 10000)
+        }, 1000)
     }, [])
     return (
         <View style = {styles.container}>
@@ -121,7 +121,7 @@ const Weather = ({weatherData, fetchWeatherData}) => {
                             <Text style = {{fontSize : 40, fontWeight : 'bold'}}>{Math.round(temp - 273.15)}°C</Text>
                         </View>
                         <Text style = {styles.staticText}>{main}</Text>
-                        <Text style = {{fontSize : 22, fontWeight : 'bold'}}>{description}</Text>
+                        <Text style = {{fontSize : 22, fontWeight : 'bold', textAlign : 'center'}}>{description}</Text>
                     </View>
                     <View style = {styles.weatherBottomRight}>
                         <SearchBar fetchWeatherData = {fetchWeatherData} />
