@@ -28,6 +28,7 @@ const dateBuilder = (timezone) => {
     let date = new Date(curr_time);
     let hours = date.getHours();
     let minutes = date.getMinutes();
+    let seconds = date.getSeconds();
     let day = date.getDate();
     let month = date.getMonth() + 1;
     let year = date.getFullYear();
@@ -38,7 +39,7 @@ const dateBuilder = (timezone) => {
     if(minutes < 10) {
         minutes = '0' +minutes;
     }
-    return `${hours}:${minutes} ${unit}\n${day}/${month}/${year}`;
+    return `${hours}:${minutes}:${seconds} ${unit}\n${day}/${month}/${year}`;
 }
 const checkTimeInDay = (timezone) => {
     let d = new Date();
@@ -81,10 +82,13 @@ const Weather = ({weatherData, fetchWeatherData}) => {
         setTimer(dateBuilder(timezone));
     },[weatherData]);
     useEffect(() => {
-        setInterval(() => {
+        const interval = setInterval(() => {
             setTimer(dateBuilder(timezone))
         }, 1000)
-    }, [])
+        return () => {
+            clearInterval(interval);
+        }
+    }, [timer])
     return (
         <View style = {styles.container}>
             <ImageBackground
