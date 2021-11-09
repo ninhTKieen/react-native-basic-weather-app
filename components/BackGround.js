@@ -8,7 +8,7 @@ const thunderstorm = require('../assets/background/thunderstorm.jpg');
 const nightClouds = require('../assets/background/nightClouds.jpg');
 const nightClear = require('../assets/background/nightSky.jpg');
 const BackGround = (weather, time) => {
-    if(weather == "Clear" && (time >= 18 || time <= 6)) {
+    if(weather == "Clear" && (time >= 18 || time <= 5)) {
         return nightClear;
     }
     if(weather == 'Clear') {
